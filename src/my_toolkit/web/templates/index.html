@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>图片处理工具</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .preview { max-width: 100%; margin: 20px 0; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>图片处理工具</h1>
+    
+    <!-- 关键修改1：移除form标签的action和方法，由JS处理 -->
+    <form id="upload-form">
+        <div>
+            <label>选择图片：
+                <input type="file" id="image" accept="image/*" required>
+            </label>
+        </div>
+        <div>
+            <label>宽度：<input type="number" name="width" value="800" min="100"></label>
+            <label>高度：<input type="number" name="height" value="600" min="100"></label>
+        </div>
+        <button type="button" id="process-btn">处理图片</button>
+    </form>
+    
+    <div id="result">
+        <div id="message" class=""></div>
+        <img id="output-preview" class="preview" style="display: none;">
+    </div>
+
+    <script>
+        // 关键修改2：使用按钮点击事件而非表单提交
+        document.getElementById("process-btn").onclick = async () => {
+            const messageDiv = document.getElementById("message");
+            messageDiv.textContent = "处理中...";
+            messageDiv.className = "";
+            
+            const fileInput = document.getElementById("image");
+            if (!fileInput.files[0]) {
+                messageDiv.textContent = "请先选择图片";
+                messageDiv.className = "error";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("image", fileInput.files[0]);
+            formData.append("resize", "true");
+            formData.append("width", document.querySelector("input[name='width']").value);
+            formData.append("height", document.querySelector("input[name='height']").value);
+
+            try {
+                const response = await fetch("/process", {
+                    method: "POST",
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const img = document.getElementById("output-preview");
+                    img.src = data.result_url + "?t=" + new Date().getTime(); // 防止缓存
+                    img.style.display = "block";
+                    messageDiv.textContent = "处理成功！";
+                    messageDiv.className = "success";
+                } else {
+                    messageDiv.textContent = `错误: ${data.error}`;
+                    messageDiv.className = "error";
+                }
+            } catch (err) {
+                messageDiv.textContent = `请求失败: ${err}`;
+                messageDiv.className = "error";
+                console.error(err);
+            }
+        };
+    </script>
+</body>
+</html>
