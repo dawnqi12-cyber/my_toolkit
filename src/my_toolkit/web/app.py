@@ -67,8 +67,15 @@ def process_image_api():
         else:
             print("⚠️  未启用缩放功能")
 
-        print(f"⚙️  最终操作参数: {operations}")
+        # 新增：处理旋转参数
+        if request.form.get('rotate_left') == 'true':
+            operations['rotate_left'] = True
+            print("🔄 启用左旋90°")
+        if request.form.get('rotate_right') == 'true':
+            operations['rotate_right'] = True
+            print("🔄 启用右旋90°")
 
+        print(f"⚙️  最终操作参数: {operations}")
         # 5. 处理图片
         output_filename = f"processed_{file_id}{file_ext}"
         output_path = Path('static/processed') / output_filename

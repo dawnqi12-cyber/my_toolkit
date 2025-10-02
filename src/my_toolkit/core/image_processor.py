@@ -24,7 +24,18 @@ def process_image(input_path: str, output_path: str, **operations):
             print(f"📏 执行缩放: {width}x{height}")
             img = img.resize((width, height), Image.Resampling.LANCZOS)
             print(f"✅ 缩放后尺寸: {img.size}")
+
+        if operations.get('rotate_left'):
+            print("🔄 执行左旋转90度")
+            img = img.rotate(90, expand=True)
+            print(f"✅ 旋转后尺寸: {img.size}")
         
+        if operations.get('rotate_right'):
+            print("🔄 执行右旋转90度")
+            img = img.rotate(-90, expand=True)
+            print(f"✅ 旋转后尺寸: {img.size}")
+
+
         # 保存处理后的图片
         img.save(output_path)
         print(f"💾 图片已保存: {output_path}")

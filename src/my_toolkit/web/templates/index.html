@@ -23,6 +23,11 @@
             <label>宽度：<input type="number" name="width" value="800" min="100"></label>
             <label>高度：<input type="number" name="height" value="600" min="100"></label>
         </div>
+        <div>
+            <label><input type="checkbox" id="resize" checked> 缩放</label>
+            <label><input type="checkbox" id="rotate_left"> 左旋90°</label>
+            <label><input type="checkbox" id="rotate_right"> 右旋90°</label>
+        </div>
         <button type="button" id="process-btn">处理图片</button>
     </form>
     
@@ -32,12 +37,11 @@
     </div>
 
     <script>
-        // 关键修改2：使用按钮点击事件而非表单提交
         document.getElementById("process-btn").onclick = async () => {
             const messageDiv = document.getElementById("message");
             messageDiv.textContent = "处理中...";
             messageDiv.className = "";
-            
+
             const fileInput = document.getElementById("image");
             if (!fileInput.files[0]) {
                 messageDiv.textContent = "请先选择图片";
@@ -47,21 +51,31 @@
 
             const formData = new FormData();
             formData.append("image", fileInput.files[0]);
-            formData.append("resize", "true");
-            formData.append("width", document.querySelector("input[name='width']").value);
-            formData.append("height", document.querySelector("input[name='height']").value);
+
+            // 根据复选框决定是否添加操作参数
+            if (document.getElementById("resize").checked) {
+                formData.append("resize", "true");
+                formData.append("width", document.querySelector("input[name='width']").value);
+                formData.append("height", document.querySelector("input[name='height']").value);
+            }
+            if (document.getElementById("rotate_left").checked) {
+                formData.append("rotate_left", "true");
+            }
+            if (document.getElementById("rotate_right").checked) {
+                formData.append("rotate_right", "true");
+            }
 
             try {
                 const response = await fetch("/process", {
                     method: "POST",
                     body: formData
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     const img = document.getElementById("output-preview");
-                    img.src = data.result_url + "?t=" + new Date().getTime(); // 防止缓存
+                    img.src = data.result_url + "?t=" + new Date().getTime();
                     img.style.display = "block";
                     messageDiv.textContent = "处理成功！";
                     messageDiv.className = "success";
