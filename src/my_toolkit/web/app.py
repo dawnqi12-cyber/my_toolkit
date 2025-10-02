@@ -67,17 +67,27 @@ def process_image_api():
         else:
             print("⚠️  未启用缩放功能")
 
-        # 新增：处理旋转参数
+        # 新增：处理旋转参数和翻转参数
         if request.form.get('rotate_left') == 'true':
             operations['rotate_left'] = True
             print("🔄 启用左旋90°")
         if request.form.get('rotate_right') == 'true':
             operations['rotate_right'] = True
             print("🔄 启用右旋90°")
+        if request.form.get('flip_horizontal') == 'true':
+            operations['flip_horizontal'] = True
+            print("🔄 启用翻转°")
+
+        # 新增：处理压缩参数
+        if request.form.get('compress') == 'true':
+            quality = int(request.form.get('quality', 80))
+            operations['compress'] = {'quality': quality}
+            print(f"🗜️ 启用压缩，质量: {quality}")
 
         print(f"⚙️  最终操作参数: {operations}")
+
         # 5. 处理图片
-        output_filename = f"processed_{file_id}{file_ext}"
+        output_filename = f"processed_{file_id}.jpg"
         output_path = Path('static/processed') / output_filename
         
         # ========== 添加验证代码：记录处理前文件信息 ==========

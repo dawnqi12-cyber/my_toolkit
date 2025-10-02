@@ -11,8 +11,6 @@
 </head>
 <body>
     <h1>图片处理工具</h1>
-    
-    <!-- 关键修改1：移除form标签的action和方法，由JS处理 -->
     <form id="upload-form">
         <div>
             <label>选择图片：
@@ -27,6 +25,9 @@
             <label><input type="checkbox" id="resize" checked> 缩放</label>
             <label><input type="checkbox" id="rotate_left"> 左旋90°</label>
             <label><input type="checkbox" id="rotate_right"> 右旋90°</label>
+            <label><input type="checkbox" id="flip_horizontal"> 水平翻转</label>  <!-- 添加翻转复选框 -->
+            <label><input type="checkbox" id="compress"> 压缩</label>
+            <label>压缩质量：<input type="number" name="quality" value="80" min="0" max="100"></label>
         </div>
         <button type="button" id="process-btn">处理图片</button>
     </form>
@@ -63,6 +64,13 @@
             }
             if (document.getElementById("rotate_right").checked) {
                 formData.append("rotate_right", "true");
+            }
+            if (document.getElementById("flip_horizontal").checked) {  // 添加翻转参数
+                formData.append("flip_horizontal", "true");
+            }
+            if(document.getElementById("compress").checked) {
+                formData.append("compress", "true");
+                formData.append("quality", document.querySelector("input[name='quality']").value);
             }
 
             try {

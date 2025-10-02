@@ -25,6 +25,7 @@ def process_image(input_path: str, output_path: str, **operations):
             img = img.resize((width, height), Image.Resampling.LANCZOS)
             print(f"✅ 缩放后尺寸: {img.size}")
 
+
         if operations.get('rotate_left'):
             print("🔄 执行左旋转90度")
             img = img.rotate(90, expand=True)
@@ -35,9 +36,21 @@ def process_image(input_path: str, output_path: str, **operations):
             img = img.rotate(-90, expand=True)
             print(f"✅ 旋转后尺寸: {img.size}")
 
+        if operations.get('flip_horizontal'):
+            print("🔄 执行水平左翻转")
+            img = img.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+            print(f"✅ 翻转后尺寸: {img.size}")
 
-        # 保存处理后的图片
-        img.save(output_path)
+        if 'compress' in operations:
+            compress_params = operations['compress']
+            quality = compress_params.get('quality')
+            print(f"🗜️ 执行压缩，质量: {quality}")
+            img.save(output_path, quality=quality, optimize=True)
+        else:
+            img.save(output_path)
+
+        # # 保存处理后的图片
+        # img.save(output_path)
         print(f"💾 图片已保存: {output_path}")
     
     return True
